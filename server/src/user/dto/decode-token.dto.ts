@@ -1,3 +1,3 @@
 export class DecodeTokenDto {
-  token: string;
+	token: string;
 }
