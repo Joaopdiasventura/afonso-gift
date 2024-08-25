@@ -29,7 +29,7 @@ export class UserService {
 	async findUnique(email: string, nickName: string): Promise<User | null> {
 		return this.userModel
 			.findOne({
-				$or: [{ email }, { nickName }],
+				$or: [{ _id: email }, { nickName }],
 			})
 			.exec();
 	}

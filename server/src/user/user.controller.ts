@@ -70,14 +70,17 @@ export class UserController {
 
 	@Post("login")
 	async login(@Body() loginUserDto: LoginUserDto) {
-		const user = await this.userService.findByEmail(loginUserDto.email);
+		const user = await this.userService.findUnique(
+			loginUserDto.identifier,
+			loginUserDto.identifier,
+		);
 		if (!user)
-			throw new BadRequestException(
-				"Não existe nenhum usuário com esse email",
+			throw new NotFoundException(
+				"Não existe nenhum usuário com esse email ou apelido",
 			);
-
 		if (!compareSync(loginUserDto.password, user.password))
 			throw new UnauthorizedException("Senha incorreta");
+		return this.encode(user.email);
 	}
 
 	@Post("decode")
@@ -87,7 +90,7 @@ export class UserController {
 		try {
 			const email = verify(token, this.SECRET_KEY) as string;
 			const user = await this.userService.findByEmail(email);
-			if (!user) throw new BadRequestException("Usuário não encontrado");
+			if (!user) throw new NotFoundException("Usuário não encontrado");
 
 			const followersCount = await this.userService.countFollowers(
 				user.nickName,
@@ -95,7 +98,7 @@ export class UserController {
 			const followingCount = await this.userService.countFollowing(
 				user.nickName,
 			);
-			return { ...user.toObject(), followersCount, followingCount };
+			return { ...user, followersCount, followingCount };
 		} catch (error) {
 			throw new BadRequestException("Token inválido");
 		}
@@ -112,8 +115,7 @@ export class UserController {
 		const followingCount = await this.userService.countFollowing(
 			user.nickName,
 		);
-
-		return { ...user.toObject(), followersCount, followingCount };
+		return { ...user, followersCount, followingCount };
 	}
 
 	@Get("/nickName/:nickName")
@@ -127,8 +129,7 @@ export class UserController {
 		const followingCount = await this.userService.countFollowing(
 			user.nickName,
 		);
-
-		return { ...user.toObject(), followersCount, followingCount };
+		return { ...user, followersCount, followingCount };
 	}
 
 	@Patch(":email")
