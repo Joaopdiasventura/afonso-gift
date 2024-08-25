@@ -34,6 +34,18 @@ export class UserService {
 			.exec();
 	}
 
+	async findMany(identifier: string): Promise<User[]> {
+		return this.userModel
+			.find({
+				$or: [
+					{ name: { $regex: identifier, $options: "i" } },
+					{ nickName: { $regex: identifier, $options: "i" } },
+				],
+			})
+			.sort({ name: 1 })
+			.exec();
+	}
+
 	async findFollowers(
 		nickName: string,
 	): Promise<{ nickName: string; name: string; picture: string }[]> {

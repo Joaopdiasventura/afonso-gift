@@ -132,6 +132,21 @@ export class UserController {
 		return { ...user, followersCount, followingCount };
 	}
 
+	@Get("/followers/:nickName")
+	async findFollows(@Param("nickName") nickName: string) {
+		return this.userService.findFollowers(nickName);
+	}
+
+	@Get("/followings/:nickName")
+	async findFollowings(@Param("nickName") nickName: string) {
+		return this.userService.findFollowings(nickName);
+	}
+
+	@Get("/findMany/:identifier")
+	async findMany(@Param("identifier") identifier: string) {
+		return this.userService.findMany(identifier);
+	}
+
 	@Patch(":email")
 	@UseInterceptors(FileInterceptor("file"))
 	async update(
