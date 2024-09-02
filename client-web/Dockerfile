@@ -20,4 +20,4 @@ COPY --from=build /app/dist/client-web /app
 
 EXPOSE 80
 
-CMD ["http-server", "/app", "-p", "80"]
+CMD ["http-server", "/app", "-p", "80", "-c-1"]
