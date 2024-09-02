@@ -10,12 +10,14 @@ COPY . .
 
 RUN npm run build -- --configuration production
 
-FROM nginx:alpine
+FROM node:20.12.2
 
-COPY --from=build /app/dist/client-web /usr/share/nginx/html
+WORKDIR /app
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN npm install -g http-server
+
+COPY --from=build /app/dist/client-web /app
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["http-server", "/app", "-p", "80"]
