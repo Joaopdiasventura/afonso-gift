@@ -1,3 +1,4 @@
+import { ImageService } from "./../services/image.service";
 import {
 	Controller,
 	Get,
@@ -7,7 +8,6 @@ import {
 	Param,
 	Delete,
 	BadRequestException,
-	HttpCode,
 	NotFoundException,
 	UnauthorizedException,
 	UseInterceptors,
@@ -21,16 +21,16 @@ import { DecodeTokenDto } from "./dto/decode-token.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { sign, verify } from "jsonwebtoken";
 import { compareSync, hashSync } from "bcrypt";
-import { v4 as uuid } from "uuid";
-import { join } from "path";
-import { existsSync, unlinkSync, writeFileSync } from "fs";
 
 @Controller("user")
 export class UserController {
 	SECRET_KEY: string;
 	HASH: number;
 
-	constructor(private readonly userService: UserService) {
+	constructor(
+		private readonly userService: UserService,
+		private readonly imageService: ImageService,
+	) {
 		this.SECRET_KEY = process.env.SECRET_KEY;
 		this.HASH = parseInt(process.env.HASH);
 	}
@@ -57,9 +57,8 @@ export class UserController {
 				);
 		}
 
-		if (file) {
-			createUserDto.picture = this.saveImage(file);
-		}
+		if (file)
+			createUserDto.picture = await this.imageService.uploadImage(file);
 
 		createUserDto.password = this.hashPassword(createUserDto.password);
 
@@ -68,83 +67,28 @@ export class UserController {
 		);
 	}
 
-	@Post("login")
+	@Post("/login")
 	async login(@Body() loginUserDto: LoginUserDto) {
 		const user = await this.userService.findUnique(
 			loginUserDto.identifier,
 			loginUserDto.identifier,
 		);
-		if (!user)
-			throw new NotFoundException(
-				"Não existe nenhum usuário com esse email ou apelido",
-			);
+		if (!user) throw new NotFoundException("Conta não encontrada");
 		if (!compareSync(loginUserDto.password, user.password))
 			throw new UnauthorizedException("Senha incorreta");
 		return this.encode(user.email);
 	}
 
-	@Post("decode")
-	@HttpCode(200)
+	@Post("/decode")
 	async decode(@Body() decodeTokenDto: DecodeTokenDto) {
-		const { token } = decodeTokenDto;
 		try {
-			const email = verify(token, this.SECRET_KEY) as string;
-			const user = await this.userService.findByEmail(email);
-			if (!user) throw new NotFoundException("Usuário não encontrado");
-
-			const followersCount = await this.userService.countFollowers(
-				user.nickName,
-			);
-			const followingCount = await this.userService.countFollowing(
-				user.nickName,
-			);
-			return { ...user, followersCount, followingCount };
+			const email = verify(decodeTokenDto.token, this.SECRET_KEY);
+			const user = await this.userService.findByEmail(email as string);
+			if (!user) throw new BadRequestException("Usuário não encontrado");
+			return user;
 		} catch (error) {
 			throw new BadRequestException("Token inválido");
 		}
-	}
-
-	@Get("/email/:email")
-	async findByEmail(@Param("email") email: string) {
-		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("Usuário não encontrado");
-
-		const followersCount = await this.userService.countFollowers(
-			user.nickName,
-		);
-		const followingCount = await this.userService.countFollowing(
-			user.nickName,
-		);
-		return { ...user, followersCount, followingCount };
-	}
-
-	@Get("/nickName/:nickName")
-	async findByNickName(@Param("nickName") nickName: string) {
-		const user = await this.userService.findByEmail(nickName);
-		if (!user) throw new NotFoundException("Usuário não encontrado");
-
-		const followersCount = await this.userService.countFollowers(
-			user.nickName,
-		);
-		const followingCount = await this.userService.countFollowing(
-			user.nickName,
-		);
-		return { ...user, followersCount, followingCount };
-	}
-
-	@Get("/followers/:nickName")
-	async findFollows(@Param("nickName") nickName: string) {
-		return this.userService.findFollowers(nickName);
-	}
-
-	@Get("/followings/:nickName")
-	async findFollowings(@Param("nickName") nickName: string) {
-		return this.userService.findFollowings(nickName);
-	}
-
-	@Get("/findMany/:identifier")
-	async findMany(@Param("identifier") identifier: string) {
-		return this.userService.findMany(identifier);
 	}
 
 	@Patch(":email")
@@ -180,17 +124,10 @@ export class UserController {
 				existingUser.picture !=
 					"https://icones.pro/wp-content/uploads/2021/02/icono-de-camara-gris.png"
 			) {
-				const oldImagePath = join(
-					__dirname,
-					"..",
-					"..",
-					"uploads",
-					existingUser.picture,
-				);
-				this.deleteImage(oldImagePath);
+				const imageName = existingUser.picture.split("/").pop();
+				await this.imageService.deleteImage(imageName);
 			}
-
-			updateUserDto.picture = this.saveImage(file);
+			updateUserDto.picture = await this.imageService.uploadImage(file);
 		}
 
 		if (updateUserDto.password) {
@@ -208,36 +145,67 @@ export class UserController {
 		if (!user) throw new NotFoundException("Usuário não encontrado");
 
 		if (user.picture) {
-			const imagePath = join(
-				__dirname,
-				"..",
-				"..",
-				"uploads",
-				user.picture,
-			);
-			this.deleteImage(imagePath);
+			const imageName = user.picture.split("/").pop();
+			await this.imageService.deleteImage(imageName);
 		}
 
 		await this.userService.remove(email);
 		return { message: "Usuário removido com sucesso" };
 	}
 
-	@Patch(":nickName/follow/:followNickName")
-	async followUser(
-		@Param("nickName") nickName: string,
-		@Param("followNickName") followNickName: string,
-	) {
-		await this.userService.followUser(nickName, followNickName);
-		return { message: "Seguindo o usuário " + followNickName };
+	@Get("email/:email")
+	async findByEmail(@Param("email") email: string) {
+		const user = await this.userService.findByEmail(email);
+		if (!user) throw new NotFoundException("Usuário não encontrado");
+		return user;
 	}
 
-	@Patch(":nickName/unfollow/:unfollowNickName")
+	@Get("nickName/:nickName")
+	async findByNickName(@Param("nickName") nickName: string) {
+		const user = await this.userService.findByNickName(nickName);
+		if (!user) throw new NotFoundException("Usuário não encontrado");
+		return user;
+	}
+
+	@Get("/findMany/:nickName")
+	async findMany(@Param("nickName") nickName: string) {
+		return this.userService.findMany(nickName);
+	}
+
+	@Get("/followers/:nickName")
+	async findFollowers(@Param("nickName") nickName: string) {
+		return this.userService.findFollowers(nickName);
+	}
+
+	@Get("/followings/:nickName")
+	async findFollowings(@Param("nickName") nickName: string) {
+		return this.userService.findFollowings(nickName);
+	}
+
+	@Patch("/follow/:userNickName/:followNickName")
+	async followUser(
+		@Param("userNickName") userNickName: string,
+		@Param("followNickName") followNickName: string,
+	) {
+		return this.userService.followUser(userNickName, followNickName);
+	}
+
+	@Patch("/unfollow/:userNickName/:unfollowNickName")
 	async unfollowUser(
-		@Param("nickName") nickName: string,
+		@Param("userNickName") userNickName: string,
 		@Param("unfollowNickName") unfollowNickName: string,
 	) {
-		await this.userService.unfollowUser(nickName, unfollowNickName);
-		return { message: "Deixando de seguir o usuário " + unfollowNickName };
+		return this.userService.unfollowUser(userNickName, unfollowNickName);
+	}
+
+	@Get("/count-followers/:nickName")
+	async countFollowers(@Param("nickName") nickName: string) {
+		return this.userService.countFollowers(nickName);
+	}
+
+	@Get("/count-following/:nickName")
+	async countFollowing(@Param("nickName") nickName: string) {
+		return this.userService.countFollowing(nickName);
 	}
 
 	private encode(email: string) {
@@ -246,34 +214,5 @@ export class UserController {
 
 	private hashPassword(password: string) {
 		return hashSync(password, this.HASH);
-	}
-
-	private saveImage(file: Express.Multer.File): string {
-		const uniqueFileName = `${uuid()}${file.originalname}`;
-		const uploadPath = join(
-			__dirname,
-			"..",
-			"..",
-			"uploads",
-			uniqueFileName,
-		);
-
-		try {
-			writeFileSync(uploadPath, file.buffer);
-		} catch (err) {
-			throw new BadRequestException("Erro ao salvar a imagem");
-		}
-
-		return uniqueFileName;
-	}
-
-	private deleteImage(imagePath: string) {
-		if (existsSync(imagePath)) {
-			try {
-				unlinkSync(imagePath);
-			} catch (err) {
-				console.error(`Erro ao excluir a imagem: ${err.message}`);
-			}
-		}
 	}
 }

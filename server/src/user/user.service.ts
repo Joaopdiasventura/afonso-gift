@@ -19,7 +19,7 @@ export class UserService {
 	}
 
 	async findByEmail(email: string): Promise<User | null> {
-		return this.userModel.findOne({ email }).exec(); // Corrigido findById para findOne
+		return this.userModel.findById(email).exec();
 	}
 
 	async findByNickName(nickName: string): Promise<User | null> {
@@ -42,7 +42,7 @@ export class UserService {
 					{ nickName: { $regex: identifier, $options: "i" } },
 				],
 			})
-			.sort({ name: 1 })
+			.sort({ name: 1, nickName: 1 })
 			.exec();
 	}
 
