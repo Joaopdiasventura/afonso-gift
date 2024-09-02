@@ -1,0 +1,62 @@
+<div
+	class="search-container flex flex-col items-center justify-center h-screen px-[25vw] bg-black"
+>
+	<div class="card w-full max-w-md p-4 bg-gray-900 rounded-lg shadow-lg">
+		<div class="input-container mb-4">
+			<input
+				type="text"
+				[(ngModel)]="identifier"
+				(input)="getUsers()"
+				placeholder="Buscar usuários..."
+				class="search-input w-full p-2 border border-gray-400 rounded"
+			/>
+		</div>
+		<div class="users-container overflow-y-auto">
+			<div *ngIf="isLoading" class="loading-spinner mb-4">
+				<div class="spinner"></div>
+			</div>
+			<div *ngIf="!isLoading">
+				<a
+					*ngFor="let user of users"
+					[routerLink]="['/user', user.nickName]"
+					class="user-item p-4 mb-2 flex items-center bg-red-800 rounded cursor-pointer transition-all hover:bg-red-900"
+				>
+					<img
+						[src]="
+							user.picture ||
+							'https://icones.pro/wp-content/uploads/2021/02/icono-de-camara-gris.png'
+						"
+						alt="User Picture"
+						class="rounded-full w-10 h-10"
+					/>
+					<div class="user-info ml-4">
+						<span class="user-name text-white block font-bold">{{
+							user.name
+						}}</span>
+						<span class="user-nickname text-gray-400 text-sm">{{
+							user.nickName
+						}}</span>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+	<footer class="w-full py-2 flex justify-around">
+		<button
+			(click)="navigateToIndex()"
+			class="flex items-center justify-center"
+		>
+			<img src="house.png" alt="User Profile" class="w-10 h-10" />
+		</button>
+		<button
+			(click)="navigateToProfile()"
+			class="flex items-center justify-center"
+		>
+			<img
+				[src]="getCurrentUserProfilePicture()"
+				alt="User Profile"
+				class="rounded-full w-10 h-10"
+			/>
+		</button>
+	</footer>
+</div>

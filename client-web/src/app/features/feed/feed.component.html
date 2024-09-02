@@ -1,0 +1,63 @@
+<div
+	class="flex flex-col items-center justify-center w-screen h-screen px-[25vw] bg-black"
+>
+	<div class="flex flex-col h-auto justify-center items-center container">
+		<div *ngIf="isLoading" class="spinner"></div>
+		<div class="feed-container">
+			<div *ngIf="!isLoading" class="overflow-auto">
+				<h1 class="ti">SEU FEED</h1>
+				<div *ngFor="let post of posts" class="post-item overflow-auto">
+					<div class="post-header">
+						<img
+							[src]="getUserPicture(post.user)"
+							alt="User Picture"
+							class="rounded-full w-10 h-10"
+						/>
+						<div class="post-user-info">
+							<span class="post-user-name">{{
+								getUserName(post.user)
+							}}</span>
+							<span class="post-user-nickname">{{
+								getUserNickName(post.user)
+							}}</span>
+						</div>
+					</div>
+					<div class="post-content">
+						<p>{{ post.description }}</p>
+						<img
+							*ngIf="post.picture"
+							[src]="post.picture"
+							alt="Post Picture"
+							class="post-image"
+						/>
+					</div>
+					<div class="post-footer">
+						<span>{{ post.created_at | date: "medium" }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="w-full py-2 flex justify-around">
+			<button
+				(click)="navigateToSearch()"
+				class="flex items-center justify-center"
+			>
+				<img
+					src="loupe.png"
+					alt="User Profile"
+					class="rounded-full w-10 h-10"
+				/>
+			</button>
+			<button
+				(click)="navigateToProfile()"
+				class="flex items-center justify-center"
+			>
+				<img
+					[src]="getCurrentUserProfilePicture()"
+					alt="User Profile"
+					class="rounded-full w-10 h-10"
+				/>
+			</button>
+		</footer>
+	</div>
+</div>

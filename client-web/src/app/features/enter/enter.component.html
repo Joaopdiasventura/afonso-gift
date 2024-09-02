@@ -1,0 +1,116 @@
+<div
+	class="flex flex-col items-center justify-center h-screen px-[25vw] bg-black"
+>
+	<div *ngIf="isLoading" class="loading-spinner">
+		<div class="spinner"></div>
+	</div>
+	<div *ngIf="!isLoading" [ngClass]="containerClasses">
+		<div class="form-container sign-up">
+			<form id="registrar" (ngSubmit)="register()">
+				<h1 class="text-center">CRIE SUA CONTA</h1>
+				<div
+					class="image-upload-container"
+					(click)="triggerFileInput()"
+				>
+					<img
+						[src]="
+							selectedImageSrc ||
+							'https://icones.pro/wp-content/uploads/2021/02/icono-de-camara-gris.png'
+						"
+						alt="Profile"
+						class="rounded-full w-20 h-20"
+					/>
+				</div>
+				<input
+					type="file"
+					#fileInput
+					(change)="onFileSelected($event)"
+					accept="image/*"
+					class="enter-input hidden"
+				/>
+				<input
+					type="text"
+					placeholder="Nome:"
+					[(ngModel)]="name"
+					name="name"
+					class="enter-input"
+				/>
+				<input
+					type="email"
+					placeholder="Email:"
+					[(ngModel)]="email"
+					name="email"
+					class="enter-input"
+				/>
+				<input
+					type="text"
+					placeholder="Apelido:"
+					[(ngModel)]="nickName"
+					name="nickName"
+					class="enter-input"
+				/>
+				<input
+					type="password"
+					placeholder="Senha:"
+					[(ngModel)]="password"
+					name="password"
+					class="enter-input"
+				/>
+				<input
+					type="password"
+					placeholder="Repita sua senha:"
+					[(ngModel)]="password2"
+					name="password2"
+					class="enter-input"
+				/>
+				<button type="submit" class="enter-button">REGISTRE-SE</button>
+			</form>
+		</div>
+		<div class="form-container sign-in">
+			<form id="logar" (ngSubmit)="logar()">
+				<h1>LOGIN</h1>
+				<input
+					type="text"
+					placeholder="Email/Apelido:"
+					[(ngModel)]="identifier"
+					name="identifier"
+					class="enter-input"
+				/>
+				<input
+					type="password"
+					placeholder="Senha:"
+					[(ngModel)]="password"
+					name="password"
+					class="enter-input"
+				/>
+				<button type="submit" class="enter-button">LOGIN</button>
+			</form>
+		</div>
+		<div class="toggle-container">
+			<div class="toggle">
+				<div class="toggle-panel toggle-left">
+					<h1>BEM VINDO DE VOLTA</h1>
+					<br />
+					<button
+						id="register"
+						(click)="change()"
+						class="transparent-button"
+					>
+						LOGAR
+					</button>
+				</div>
+				<div class="toggle-panel toggle-right">
+					<h1>BEM VINDO</h1>
+					<br />
+					<button
+						id="register"
+						(click)="change()"
+						class="transparent-button"
+					>
+						REGISTRE-SE
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
