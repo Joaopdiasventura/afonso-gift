@@ -75,7 +75,7 @@ export class EnterComponent {
 			},
 			error: (error) => {
 				this.isLoading = false;
-				console.log("Erro ao registrar:", error);
+				alert("Erro ao registrar: " + error.error.message);
 			},
 		});
 	}
@@ -94,7 +94,7 @@ export class EnterComponent {
 				},
 				error: (error) => {
 					this.isLoading = false;
-					console.log(error);
+					alert("Erro ao logar" + error.error.message);
 				},
 			});
 	}
