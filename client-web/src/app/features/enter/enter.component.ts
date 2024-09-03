@@ -94,7 +94,7 @@ export class EnterComponent {
 				},
 				error: (error) => {
 					this.isLoading = false;
-					alert("Erro ao logar" + error.error.message);
+					alert("Erro ao logar: " + error.error.message);
 				},
 			});
 	}
