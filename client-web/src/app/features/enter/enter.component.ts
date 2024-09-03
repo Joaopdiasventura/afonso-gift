@@ -2,7 +2,7 @@ import { UserService } from "./../../core/services/user.service";
 import { CommonModule } from "@angular/common";
 import { Component, ViewChild, ElementRef } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { UserContext } from "../../shared/user.service";
+import { UserContext } from "../../shared/user.context";
 import { Router } from "@angular/router";
 
 @Component({

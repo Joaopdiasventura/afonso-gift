@@ -1,1 +1,65 @@
-<p>post works!</p>
+<div
+	class="flex flex-col items-center justify-center w-screen h-screen px-[25vw] bg-black"
+>
+	<div class="flex flex-col h-auto justify-center items-center container">
+		<div *ngIf="isLoading" class="loading-spinner">
+			<div class="spinner"></div>
+		</div>
+		<div *ngIf="!isLoading" class="post-container">
+			<h1 class="ti text-3xl flex h-auto items-center">CRIAR POST:</h1>
+			<div class="post-form">
+				<input
+					type="file"
+					id="file"
+					(change)="onFileSelected($event)"
+					class="file-input hidden"
+				/>
+
+				<label class="image-preview" for="file">
+					<img
+						[src]="selectedImageSrc"
+						alt="Imagem Selecionada"
+						class="preview-image"
+					/>
+				</label>
+				<textarea
+					[(ngModel)]="description"
+					placeholder="Descrição do post"
+					class="description-input outline-none"
+				></textarea>
+				<button (click)="create()" class="submit-button">
+					Criar Post
+				</button>
+			</div>
+		</div>
+
+		<footer class="w-full max-w-md py-2 flex justify-around">
+			<button
+				(click)="navigateToIndex()"
+				class="flex items-center justify-center"
+			>
+				<img src="house.png" alt="Buscar" class="w-10 h-10" />
+			</button>
+			<button
+				(click)="navigateToSearch()"
+				class="flex items-center justify-center"
+			>
+				<img
+					src="loupe.png"
+					alt="Buscar"
+					class="rounded-full w-10 h-10"
+				/>
+			</button>
+			<button
+				(click)="navigateToProfile()"
+				class="flex items-center justify-center"
+			>
+				<img
+					[src]="getUserPicture(currentUser)"
+					alt="Perfil"
+					class="rounded-full w-10 h-10"
+				/>
+			</button>
+		</footer>
+	</div>
+</div>

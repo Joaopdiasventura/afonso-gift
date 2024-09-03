@@ -10,6 +10,9 @@ export class PostService {
 	private readonly apiUrl: string = environment.api.url + "/post";
 	constructor(private http: HttpClient) {}
 
+	create(dto: FormData) {
+		return this.http.post<{ message: string }>(this.apiUrl, dto);
+	}
 	getByFollowings(user: string) {
 		return this.http.get<Post[]>(this.apiUrl + "/followings/" + user);
 	}

@@ -4,7 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import { User } from "../../../models/user";
 import { UserService } from "../../core/services/user.service";
-import { UserContext } from "../../shared/user.service";
+import { UserContext } from "../../shared/user.context";
 
 @Component({
 	selector: "app-search",
@@ -71,6 +71,10 @@ export class SearchComponent implements OnInit {
 
 	navigateToProfile() {
 		this.router.navigate(["/user/" + this.currentUser?.nickName]);
+	}
+
+	navigateToPost() {
+		this.router.navigate(["/post"]);
 	}
 
 	getCurrentUserProfilePicture(): string {

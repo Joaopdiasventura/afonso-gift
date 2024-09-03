@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Post } from "../../../models/post";
 import { PostService } from "./../../core/services/post.service";
 import { UserService } from "./../../core/services/user.service";
-import { UserContext } from "./../../shared/user.service";
+import { UserContext } from "../../shared/user.context";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { User } from "../../../models/user";
@@ -78,6 +78,10 @@ export class FeedComponent implements OnInit {
 
 	navigateToProfile() {
 		this.router.navigate(["/user/" + this.currentUser?.nickName]);
+	}
+
+	navigateToPost() {
+		this.router.navigate(["/post"]);
 	}
 
 	getCurrentUserProfilePicture(): string {

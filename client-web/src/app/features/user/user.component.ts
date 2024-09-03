@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { User } from "../../../models/user";
 import { UserService } from "../../core/services/user.service";
-import { UserContext } from "../../shared/user.service";
+import { UserContext } from "../../shared/user.context";
 import { Post } from "../../../models/post";
 import { PostService } from "../../core/services/post.service";
 import { CommonModule } from "@angular/common";
@@ -128,7 +128,7 @@ export class UserComponent {
 					(f) =>
 						this.currentUser &&
 						f.nickName === this.currentUser.nickName,
-				)
+			  )
 			: false;
 	}
 
@@ -172,6 +172,15 @@ export class UserComponent {
 
 	navigateToSearch() {
 		this.router.navigate(["/search"]);
+	}
+
+	navigateToPost() {
+		this.router.navigate(["/post"]);
+	}
+
+	logout() {
+		localStorage.removeItem("token");
+		this.router.navigate(["/enter"]);
 	}
 
 	getCurrentUserProfilePicture(): string {

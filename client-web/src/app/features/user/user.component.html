@@ -40,6 +40,13 @@
 					>
 						{{ isFollowing() ? "SEGUINDO" : "SEGUIR" }}
 					</button>
+					<button
+						*ngIf="currentUser?.nickName == user?.nickName"
+						class="py-1/2 rounded-md font-bold transition-all bg-red-700 text-white px-2"
+						(click)="logout()"
+					>
+						SAIR
+					</button>
 				</div>
 				<div class="user-stats flex mt-2 justify-center">
 					<span class="stat-item text-white mr-4"
@@ -84,6 +91,16 @@
 			class="flex items-center justify-center"
 		>
 			<img src="house.png" alt="User Profile" class="w-10 h-10" />
+		</button>
+		<button
+			(click)="navigateToPost()"
+			class="flex items-center justify-center"
+		>
+			<img
+				src="add.png"
+				alt="User Profile"
+				class="rounded-full w-8 h-8"
+			/>
 		</button>
 		<button
 			(click)="navigateToSearch()"
