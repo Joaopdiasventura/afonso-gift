@@ -25,4 +25,22 @@ export class UserService {
 	findByNickName(nickName: string) {
 		return this.http.get<User>(this.apiUrl + "/nickName/" + nickName);
 	}
+	findFollowers(nickName: string) {
+		return this.http.get<User[]>(this.apiUrl + "/followers/" + nickName);
+	}
+	findFollowings(nickName: string) {
+		return this.http.get<User[]>(this.apiUrl + "/followings/" + nickName);
+	}
+	follow(nickName: string, follow: string) {
+		return this.http.patch(
+			this.apiUrl + `/follow/${nickName}/${follow}`,
+			{},
+		);
+	}
+	unfollow(nickName: string, unfollow: string) {
+		return this.http.patch(
+			this.apiUrl + `/unfollow/${nickName}/${unfollow}`,
+			{},
+		);
+	}
 }

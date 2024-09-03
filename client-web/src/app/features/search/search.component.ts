@@ -70,7 +70,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	navigateToProfile() {
-		this.router.navigate(["/profile"]);
+		this.router.navigate(["/user/" + this.currentUser?.nickName]);
 	}
 
 	getCurrentUserProfilePicture(): string {

@@ -1,1 +1,99 @@
-<p>user works!</p>
+<div
+	class="user-container flex flex-col items-center justify-center h-screen px-[10vw] bg-black"
+>
+	<div *ngIf="isLoading" class="loading-spinner mb-4">
+		<div class="spinner"></div>
+	</div>
+	<div
+		*ngIf="!isLoading"
+		class="user-card w-full max-w-4xl p-4 bg-gray-900 rounded-lg shadow-lg"
+	>
+		<div class="user-info-container mb-4 flex items-center justify-center">
+			<img
+				[src]="
+					user?.picture ||
+					'https://icones.pro/wp-content/uploads/2021/02/icono-de-camara-gris.png'
+				"
+				alt="User Picture"
+				class="rounded-full w-24 h-24"
+			/>
+			<div class="user-details ml-6">
+				<div class="flex h-auto items-center gap-5">
+					<div>
+						<span
+							class="user-name text-white block font-bold text-2xl"
+							>{{ user?.name }}</span
+						>
+						<span class="user-nickname text-gray-400 text-lg">{{
+							user?.nickName
+						}}</span>
+					</div>
+					<button
+						*ngIf="currentUser?.nickName != user?.nickName"
+						[ngClass]="{
+							'bg-red-700 text-white': !isFollowing(),
+							'bg-black text-gray-200 border border-white/20':
+								isFollowing(),
+						}"
+						class="p-1 rounded-md font-bold transition-all"
+						(click)="changeFollow()"
+					>
+						{{ isFollowing() ? "SEGUINDO" : "SEGUIR" }}
+					</button>
+				</div>
+				<div class="user-stats flex mt-2 justify-center">
+					<span class="stat-item text-white mr-4"
+						><strong>{{ posts.length }}</strong> posts</span
+					>
+					<span class="stat-item text-white mr-4"
+						><strong>{{ followers.length || 0 }}</strong>
+						followers</span
+					>
+					<span class="stat-item text-white"
+						><strong>{{ followings.length || 0 }}</strong>
+						following</span
+					>
+				</div>
+			</div>
+		</div>
+		<div class="posts-container grid grid-cols-3 gap-2 mt-4">
+			<div *ngFor="let post of posts" class="post-item relative">
+				<img
+					[src]="post.picture"
+					alt="Post Image"
+					class="post-image w-20 h-20 object-cover rounded-lg"
+				/>
+				<div
+					class="post-overlay absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+				>
+					<div class="post-info text-center text-white">
+						<span class="post-user block font-bold">{{
+							getUserName(post)
+						}}</span>
+						<p class="post-description text-sm">
+							{{ post.description }}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer class="w-full max-w-md py-2 flex justify-around">
+		<button
+			(click)="navigateToIndex()"
+			class="flex items-center justify-center"
+		>
+			<img src="house.png" alt="User Profile" class="w-10 h-10" />
+		</button>
+		<button
+			(click)="navigateToSearch()"
+			class="flex items-center justify-center"
+		>
+			<img
+				src="loupe.png"
+				alt="User Profile"
+				class="rounded-full w-10 h-10"
+			/>
+		</button>
+	</footer>
+</div>

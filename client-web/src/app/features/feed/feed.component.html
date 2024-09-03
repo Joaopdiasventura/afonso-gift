@@ -5,7 +5,7 @@
 		<div *ngIf="isLoading" class="spinner"></div>
 		<div class="feed-container">
 			<div *ngIf="!isLoading" class="overflow-auto">
-				<h1 class="ti">SEU FEED</h1>
+				<h1 class="ti text-3xl flex h-auto items-center">SEU FEED:</h1>
 				<div *ngFor="let post of posts" class="post-item overflow-auto">
 					<div class="post-header">
 						<img
@@ -37,7 +37,7 @@
 				</div>
 			</div>
 		</div>
-		<footer class="w-full py-2 flex justify-around">
+		<footer class="w-full max-w-md py-2 flex justify-around">
 			<button
 				(click)="navigateToSearch()"
 				class="flex items-center justify-center"
