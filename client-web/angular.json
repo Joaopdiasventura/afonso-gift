@@ -38,7 +38,6 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/browser",
               "fileReplacements": [
                 {
                   "replace": "src/enviroments/enviroment.ts",
